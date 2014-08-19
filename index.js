@@ -1,13 +1,13 @@
-var connect = require('connect')
+var connect = require('connect');
 
 function c2k (middleware) {
-  middleware = connect(middleware)
-  return function (next) {
-    return function * () {
-      yield middleware.bind(null, this.req, this.res)
-      yield next
-    }
+  middleware = connect().use(middleware);
+
+  return function * (next) {
+    yield middleware.bind(null, this.req, this.res);
+    yield next;
   }
+
 }
 
-module.exports = c2k
+module.exports = c2k;

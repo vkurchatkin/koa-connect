@@ -1,17 +1,14 @@
 {
   "name": "koa-connect",
   "version": "0.0.0",
-  "description": "",
+  "description": "Use connect and express middleware in koa",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "",
-  "license": "BSD-2-Clause",
+  "author": "Vladimir Kurchatkin <vladimir.kurchatkin@gmail.com>",
+  "license": "MIT",
   "devDependencies": {
-    "koa": "0.0.2"
+    "koa": "^0.10.0"
   },
   "dependencies": {
-    "connect": "*"
+    "connect": "^2.25.7"
   }
 }
