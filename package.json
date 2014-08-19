@@ -1,6 +1,6 @@
 {
   "name": "koa-connect",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Use connect and express middleware in koa",
   "main": "index.js",
   "author": "Vladimir Kurchatkin <vladimir.kurchatkin@gmail.com>",
