@@ -4,6 +4,7 @@
   "description": "Use connect and express middleware in koa",
   "main": "index.js",
   "author": "Vladimir Kurchatkin <vladimir.kurchatkin@gmail.com>",
+  "respository": "vkurchatkin/koa-connect",
   "license": "MIT",
   "devDependencies": {
     "koa": "^0.10.0"
