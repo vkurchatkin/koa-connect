@@ -1,6 +1,8 @@
 # koa-connect
 
-Use [Connect](https://github.com/senchalabs/connect)/[Express](https://github.com/strongloop/express) middleware with Koa
+Use [Connect](https://github.com/senchalabs/connect)/[Express](https://github.com/strongloop/express) middleware with Koa.
+
+It is highly recommended to use Koa middlewares over Connect versions when they're available. That said, this module is a workaround for when that's not an option, and also to remove the need for library authors to write 2 versions of a middleware for their library.
 
 # Installation
 
@@ -9,6 +11,7 @@ npm install koa-connect
 ```
 
 # Usage
+See `examples/` for more real-world examples.
 
 ```javascript
 const Koa = require('koa');
@@ -51,7 +54,6 @@ app.use((ctx, next) => {
 
 app.listen(3000);
 ```
-See `tests.js` for additional examples
 
 # License
 
