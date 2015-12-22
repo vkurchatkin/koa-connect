@@ -1,13 +1,12 @@
-var koa = require('koa');
-var connect = require('connect');
-var c2k = require('..');
-var app = koa();
+const Koa = require('koa');
+const connect = require('connect');
+const c2k = require('..');
 
-
+const app = new Koa();
 app.use(c2k(connect.logger('dev')));
 
-app.use(function * () {
-  this.body = 'koa';
+app.use((ctx) => {
+  ctx.body = 'koa';
 });
 
 app.listen(3000);
