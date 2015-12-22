@@ -1,34 +1,57 @@
 # koa-connect
 
-Use connect and express middleware in koa
+Use [Connect](https://github.com/senchalabs/connect)/[Express](https://github.com/strongloop/express) middleware with Koa
 
-# Install
+# Installation
 
-```bash
+```sh
 npm install koa-connect
 ```
 
-# Usage:
+# Usage
 
 ```javascript
-var koa = require('koa');
-var c2k = require('koa-connect');
-var app = koa();
+const Koa = require('koa');
+const connect = require('koa-connect');
 
-function middleware (req, res, next) {
-  console.log('connect');
+// A generic Connect middleware function
+function connectMiddlware (req, res, next) {
   next();
 }
 
-app.use(c2k(middleware));
+const app = new Koa();
 
-app.use(function * () {
-  this.body = 'koa';
+// ES6
+app.use((ctx, next) => {
+  next()
+    .then(() => {
+      // The control flow will bubble back to here, like usual
+    })
+    .catch((err) => {
+      // Error handling from downstream middleware, like usual
+    })
+});
+
+// ES7
+app.use( async (ctx, next) => {
+  try {
+    await next();
+  } catch (e) {
+    // Normal error handling
+  }
+  // Normal control flow
+});
+
+app.use(connect(connectMiddlware));
+
+app.use((ctx, next) => {
+  // As long as `next` is called in the Connect middleware
+  ctx.body = 'It will continue on to here';
 });
 
 app.listen(3000);
 ```
-
+See `tests.js` for additional examples
 
 # License
 
