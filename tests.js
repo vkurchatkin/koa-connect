@@ -3,6 +3,7 @@
 const Koa = require('koa');
 const supertest = require('supertest');
 const connect = require('./index');
+const assert = require('assert')
 
 describe('koa-connect', () => {
   let app;
@@ -43,28 +44,33 @@ describe('koa-connect', () => {
   });
 
   it('bubbles back to earlier middleware', (done) => {
+    let callOne = false
+    let callTwo = false
     app.use((ctx, next) => {
-      next()
+      return next()
         .then(() => {
-          // Ensures that the following middleware is reached
-          if ( ctx.status !== 200 ) {
-            done(new Error('Never reached connect middleware'))
-          }
-          ctx.status = 201;
+          callTwo = true
         })
     });
 
-    app.use(connect((req, res) => res.statusCode = 200 ));
+    app.use(connect((req, res) => {
+      res.statusCode = 200
+      callOne = true
+    }));
 
     supertest(app.callback())
       .get('/')
-      .expect(201)
-      .end(done);
+      .expect(200)
+      .then(() => {
+        assert(callOne === true, 'Second middleware never called')
+        assert(callTwo === true, 'Never bubbled back to first middleware')
+        done()
+      })
   });
 
   it('receives errors from Connect middleware', (done) => {
     app.use((ctx, next) => {
-      next().catch((err) => ctx.status = 500)
+      next().catch((err) => ctx.status = 505)
     })
 
     app.use(connect((req, res, next) => {
@@ -78,7 +84,7 @@ describe('koa-connect', () => {
 
     supertest(app.callback())
       .get('/')
-      .expect(500)
+      .expect(505)
       .end(done);
   });
 
