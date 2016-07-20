@@ -1,31 +1,38 @@
 # koa-connect
 
-Use [Connect](https://github.com/senchalabs/connect)/[Express](https://github.com/strongloop/express) middleware with Koa.
+Use [Express](https://github.com/strongloop/express)/[Connect](https://github.com/senchalabs/connect) middleware with Koa.
 
-It is highly recommended to use Koa middlewares over Connect versions when they're available. That said, this module is a workaround for when that's not an option, and also to remove the need for library authors to write 2 versions of a middleware for their library.
+## Warning
+It is **highly** recommended to use a Koa-specific middleware instead of trying to convert an Express version when they're available. There is a non-trivial difference in the Koa and Express designs and you will inevitably run into some issues. This module is a workaround for the specific cases where the differences can be ignored. Additionally, it also enables library authors to write 1 version of their HTTP middleware.
 
-# Installation
+### Always use `next`
+Express middlewares need to declare and invoke the `next` callback appropriately for the koa-connect integration to work correctly.
+
+### For library authors
+If you're attempting to write a framework-agnostic middleware library, be sure to use only core HTTP methods and not any Express-dependent APIs like `res.send`.
+
+## Installation
 
 ```sh
-npm install koa-connect
+npm install koa-connect@next
 ```
 
-# Usage
+## Usage
 See `examples/` for more real-world examples.
 
 ```javascript
-const Koa = require('koa');
-const connect = require('koa-connect');
+const Koa = require('koa')
+const c2k = require('koa-connect')
 
-// A generic Connect middleware function
+// A generic Express-style middleware function
 function connectMiddlware (req, res, next) {
-  next();
+  res.writeHead(200, {'Content-Type': 'text/plain'})
+  res.end('From the Connect middleware')
+  next()
 }
 
-const app = new Koa();
-
-// ES6
-app.use((ctx, next) => {
+// A generic Koa v2 middlware, without async/await
+function koaMiddlware(ctx, next) {
   next()
     .then(() => {
       // The control flow will bubble back to here, like usual
@@ -33,28 +40,28 @@ app.use((ctx, next) => {
     .catch((err) => {
       // Error handling from downstream middleware, like usual
     })
-});
+}
 
-// ES7
-app.use( async (ctx, next) => {
+// A generic Koa v2 middlware with async/await
+async function koaMiddleware(ctx, next) {
   try {
     await next();
   } catch (e) {
     // Normal error handling
   }
   // Normal control flow
-});
+}
 
-app.use(connect(connectMiddlware));
-
+const app = new Koa()
+app.use(koaMiddlware)
+app.use(c2k(connectMiddlware))
 app.use((ctx, next) => {
-  // As long as `next` is called in the Connect middleware
-  ctx.body = 'It will continue on to here';
-});
+  console.log('It will continue on to here')
+})
 
-app.listen(3000);
+app.listen(3000)
 ```
 
-# License
+## License
 
 MIT

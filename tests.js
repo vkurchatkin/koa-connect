@@ -2,7 +2,7 @@
 
 const Koa = require('koa')
 const supertest = require('supertest')
-const connect = require('./index')
+const c2k = require('./index')
 const assert = require('assert')
 
 describe('koa-connect', () => {
@@ -13,12 +13,13 @@ describe('koa-connect', () => {
     app.use((ctx, next) => {
       ctx.status = 404
       ctx.body = 'Original'
-      next()
+      return next()
     })
   })
 
   it('works with a single noop Connect middleware', (done) => {
-    app.use(connect((req, res, next) => next()))
+    function noop(req, res, next) { next() }
+    app.use(c2k(noop))
     supertest(app.callback())
       .get('/')
       .expect('Original')
@@ -26,8 +27,9 @@ describe('koa-connect', () => {
   })
 
   it('works with two noop Connect middleware', (done) => {
-    app.use(connect((req, res, next) => next()))
-    app.use(connect((req, res, next) => next()))
+    function noop(req, res, next) { next() }
+    app.use(c2k(noop))
+    app.use(c2k(noop))
     supertest(app.callback())
       .get('/')
       .expect('Original')
@@ -35,8 +37,10 @@ describe('koa-connect', () => {
   })
 
   it('passes correctly to downstream Koa middlewares', (done) => {
-    app.use(connect((req, res, next) => next()))
-    app.use((ctx) => ctx.status = 200)
+    function noop(req, res, next) { next() }
+    function goodStatusSetter(ctx) { ctx.status = 200 }
+    app.use(c2k(noop))
+    app.use(goodStatusSetter)
     supertest(app.callback())
       .get('/')
       .expect(200)
@@ -53,7 +57,7 @@ describe('koa-connect', () => {
         })
     })
 
-    app.use(connect((req, res) => {
+    app.use(c2k((req, res) => {
       res.statusCode = 200
       callOne = true
     }))
@@ -73,7 +77,7 @@ describe('koa-connect', () => {
       next().catch((err) => ctx.status = 505)
     })
 
-    app.use(connect((req, res, next) => {
+    app.use(c2k((req, res, next) => {
       next(new Error('How Connect does error handling'))
     }))
 
@@ -102,7 +106,7 @@ describe('koa-connect', () => {
         })
     })
 
-    app.use(connect((req, res) => {
+    app.use(c2k((req, res) => {
       res.statusCode = 200
       res.setHeader('Content-Length', message.length)
       res.end(message)
