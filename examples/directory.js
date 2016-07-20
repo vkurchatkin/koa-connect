@@ -1,17 +1,15 @@
-var koa = require('koa');
-var connect = require('connect');
-var c2k = require('..');
-var app = koa();
+const Koa = require('koa')
+const connect = require('connect')
+const c2k = require('..')
 
+const app = new Koa()
+app.use(c2k(connect.logger('dev')))
+app.use(c2k(connect.directory(__dirname)))
+app.use(c2k(connect.static(__dirname)))
 
-app.use(c2k(connect.logger('dev')));
-app.use(c2k(connect.directory(__dirname)));
-app.use(c2k(connect.static(__dirname)));
+app.use((ctx, next) => {
+  ctx.body = 'koa'
+  next()
+})
 
-
-app.use(function * () {
-  this.body = 'koa'
-  yield next
-});
-
-app.listen(3000);
+app.listen(3000)

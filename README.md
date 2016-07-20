@@ -1,43 +1,69 @@
 # koa-connect
 
-Use [Connect](https://github.com/senchalabs/connect)/[Express](https://github.com/strongloop/express) middleware with Koa.
+Use [Express](https://github.com/strongloop/express)/[Connect](https://github.com/senchalabs/connect) middleware with Koa.
 
-It is highly recommended to use Koa middlewares over Connect versions when they're available. That said, this module is a workaround for when that's not an option, and also to remove the need for library authors to write 2 versions of a middleware for their library.
+## Warning
+It is **highly** recommended to use a Koa-specific middleware instead of trying to convert an Express version when they're available. There is a non-trivial difference in the Koa and Express designs and you will inevitably run into some issues. This module is a workaround for the specific cases where the differences can be ignored. Additionally, it also enables library authors to write 1 version of their HTTP middleware.
 
-# Installation
+### Always use `next`
+Express middlewares need to declare and invoke the `next` callback appropriately for the koa-connect integration to work correctly.
 
-```bash
-npm install koa-connect
+### For library authors
+If you're attempting to write a framework-agnostic middleware library, be sure to use only core HTTP methods and not any Express-dependent APIs like `res.send`.
+
+## Installation
+
+```sh
+npm install koa-connect@next
 ```
 
-**Note:** Requires a `Promise` implementation to be installed, either native or polyfilled.
-
-# Usage
-See `examples/` for more real-world examples, or `test/` for some spec examples.
+## Usage
+See `examples/` for more real-world examples.
 
 ```javascript
-const Koa = require('koa');
-const c2k = require('koa-connect');
-const app = new Koa();
+const Koa = require('koa')
+const c2k = require('koa-connect')
 
+// A generic Express-style middleware function
 function connectMiddlware (req, res, next) {
-  console.log('connect');
-  next();
+  res.writeHead(200, {'Content-Type': 'text/plain'})
+  res.end('From the Connect middleware')
+  next()
 }
 
-app.use(c2k(connectMiddlware));
+// A generic Koa v2 middlware, without async/await
+function koaMiddlware(ctx, next) {
+  next()
+    .then(() => {
+      // The control flow will bubble back to here, like usual
+    })
+    .catch((err) => {
+      // Error handling from downstream middleware, like usual
+    })
+}
 
-app.use(function * () {
-  this.body = 'koa';
-});
+// A generic Koa v2 middlware with async/await
+async function koaMiddleware(ctx, next) {
+  try {
+    await next();
+  } catch (e) {
+    // Normal error handling
+  }
+  // Normal control flow
+}
 
-app.listen(3000);
+const app = new Koa()
+app.use(koaMiddlware)
+app.use(c2k(connectMiddlware))
+app.use((ctx, next) => {
+  console.log('It will continue on to here')
+})
+
+app.listen(3000)
 ```
 
+## Testing
+Tests are in `tests.js` and are made with the [Mocha](https://mochajs.org) framework. You can run them with `npm test` or `npm run test:watch`
 
-# Testing
-Tests are in the `test/` directory and are made with the [Mocha](https://mochajs.org) framework. You can run them with `npm test` or `npm run test:watch`
-
-# License
-
+## License
 MIT
