@@ -9,10 +9,10 @@ describe('koa-connect', () => {
 
   beforeEach(() => {
     app = new Koa();
-    app.use( function * (next) {
-      this.status = 404;
-      this.body = 'Original';
-      yield next;
+    app.use( async function (ctx, next) {
+      ctx.body = 'Original';
+      ctx.status = 404;
+      return next();
     })
   });
 
@@ -37,7 +37,7 @@ describe('koa-connect', () => {
 
   it('passes correctly to downstream Koa middlewares', (done) => {
     app.use(c2k((req, res, next) => next()));
-    app.use(function * () { this.status = 200; });
+    app.use(function (ctx, next) { ctx.status = 200; });
     supertest(app.callback())
       .get('/')
       .expect(200)
@@ -45,13 +45,14 @@ describe('koa-connect', () => {
   });
 
   it('bubbles back to earlier middleware', (done) => {
-    app.use(function * (next) {
-      yield next;
+    app.use(async function (ctx, next) {
+      await next();
       // Ensures that the following middleware is reached
-      if ( this.status !== 200 ) {
+      if ( ctx.status !== 200 ) {
         done(new Error('Never reached connect middleware'))
+        return
       }
-      this.status = 201;
+      ctx.status = 201;
     });
 
     app.use(c2k((req, res) => res.statusCode = 200 ));
@@ -63,19 +64,15 @@ describe('koa-connect', () => {
   });
 
   it('receives errors from Connect middleware', (done) => {
-    app.use(function * (next) {
-      try {
-        yield next;
-      } catch (err) {
-        this.status = 500;
-      }
+    app.use(async function (ctx, next) {
+      await next();
     })
 
     app.use(c2k((req, res, next) => {
       next(new Error('How Connect does error handling'));
     }));
 
-    app.use(function * () {
+    app.use(async function () {
       // Fail the test if this is reached
       done(new Error('Improper error handling'))
     })
@@ -88,15 +85,15 @@ describe('koa-connect', () => {
 
   it('Setting the body or status in Koa middlewares does not do anything if res.end was used in a Connect middleware', (done) => {
     const message = 'The message that makes it';
-    app.use(function * (next) {
-      yield next;
-      if ( this.status !== 200 ) {
+    app.use(async function (ctx, next) {
+      await next();
+      if ( ctx.status !== 200 ) {
         done(new Error('Never reached connect middleware'));
       }
       // These calls won't end up doing anything
       // And will cause Koa to log a "Can't set headers after they are sent" error
-      this.status = 500;
-      this.body = 'A story already written';
+      ctx.status = 500;
+      ctx.body = 'A story already written';
     });
 
     app.use(c2k((req, res) => {
