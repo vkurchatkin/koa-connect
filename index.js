@@ -47,7 +47,7 @@ function handler(ctx, connectMiddleware) {
     // (req, res)
     let args = [
       ctx.req,
-      makeInjectedResponse(ctx, async () => {
+      makeInjectedResponse(ctx, () => {
         hasHandled = true;
       }, () => {
         resolve(false);
@@ -83,21 +83,18 @@ function handler(ctx, connectMiddleware) {
  * the `next` callback function
  */
 function koaConnect(connectMiddleware) {
-  return async function koaConnect(ctx, next) {
-    let goNext;
+  return function koaConnect(ctx, next) {
     ctx.respond = false;
-    try {
-      goNext = await handler(ctx, connectMiddleware)
-    } catch (err) {
+    return handler(ctx, connectMiddleware).then(goNext => {
+      /** If has responded, assume job is done and skip next. */
+      if(goNext){
+        ctx.respond = true;
+        return next();
+      }
+    }, err => {
       ctx.respond = true;
       throw err;
-    }
-
-    /** If has responded, assume job is done and skip next. */
-    if (goNext) {
-      ctx.respond = true;
-      return next();
-    }
+    });
   }
 }
 
