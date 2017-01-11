@@ -33,7 +33,7 @@ function connectMiddlware (req, res, next) {
 
 // A generic Koa v2 middlware, without async/await
 function koaMiddlware(ctx, next) {
-  next()
+  return next()
     .then(() => {
       // The control flow will bubble back to here, like usual
     })

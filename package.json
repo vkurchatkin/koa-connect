@@ -1,7 +1,7 @@
 {
   "name": "koa2-connect",
   "version": "1.0.0",
-  "description": "Use Connect/Express middleware in Koa",
+  "description": "Use Connect/Express middleware in Koa2",
   "repository": "https://github.com/cyrilluce/koa2-connect",
   "main": "index.js",
   "author": "cyrilluce <cyrilluce@gmail.com>",

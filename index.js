@@ -2,12 +2,15 @@ const PassThrough = require('stream').PassThrough;
 /**
  * Inject raw response, so we can know if middleware has responsed.
  */
-function makeInjectedResponse(koaCtx, markResponded) {
+function makeInjectedResponse(koaCtx, markHandled, whenEnded) {
   let res = koaCtx.res;
+
+  res.on('close', whenEnded).on('finish', whenEnded);
+
   let dummyRes = Object.create(res);
   [
     'setHeader',
-    'writeHeader',
+    'writeHead',
     'write',
     'end'
   ].forEach(name => {
@@ -17,7 +20,7 @@ function makeInjectedResponse(koaCtx, markResponded) {
       if (res.statusCode === 404) {
         res.statusCode = 200;
       }
-      markResponded(name === 'end');
+      markHandled();
     }
   });
   [
@@ -26,6 +29,7 @@ function makeInjectedResponse(koaCtx, markResponded) {
   ].forEach(name => {
     dummyRes.__defineSetter__(name, function (value) {
       res[name] = value;
+      markHandled();
     })
   })
 
@@ -43,11 +47,10 @@ function handler(ctx, connectMiddleware) {
     // (req, res)
     let args = [
       ctx.req,
-      makeInjectedResponse(ctx, async (ended) => {
+      makeInjectedResponse(ctx, async () => {
         hasHandled = true;
-        if(ended){
-          resolve(true)
-        }
+      }, () => {
+        resolve(false);
       })
     ];
     let assumeSync = true
@@ -55,7 +58,7 @@ function handler(ctx, connectMiddleware) {
     if (connectMiddleware.length >= 3) {
       args.push(err => {
         if (err) reject(err)
-        else resolve()
+        else resolve(true)
       })
       assumeSync = false
     }
@@ -69,7 +72,7 @@ function handler(ctx, connectMiddleware) {
      * assume that it's synchronous.
      */
     if (assumeSync && !hasHandled) {
-      resolve()
+      resolve(true)
     }
   })
 }
@@ -81,10 +84,17 @@ function handler(ctx, connectMiddleware) {
  */
 function koaConnect(connectMiddleware) {
   return async function koaConnect(ctx, next) {
+    let goNext;
     ctx.respond = false;
-    let responded = await handler(ctx, connectMiddleware)
+    try {
+      goNext = await handler(ctx, connectMiddleware)
+    } catch (err) {
+      ctx.respond = true;
+      throw err;
+    }
+
     /** If has responded, assume job is done and skip next. */
-    if (!responded) {
+    if (goNext) {
       ctx.respond = true;
       return next();
     }

@@ -59,6 +59,7 @@ describe('koa-connect', () => {
 
     app.use(c2k((req, res) => {
       res.statusCode = 200
+      res.end();
       callOne = true
     }))
 
@@ -74,7 +75,7 @@ describe('koa-connect', () => {
 
   it('receives errors from Connect middleware', (done) => {
     app.use((ctx, next) => {
-      next().catch((err) => ctx.status = 505)
+      return next().catch((err) => ctx.status = 505 )
     })
 
     app.use(c2k((req, res, next) => {
