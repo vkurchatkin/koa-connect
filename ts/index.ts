@@ -1,8 +1,7 @@
-const PassThrough = require('stream').PassThrough;
 /**
  * Inject raw response, so we can know if middleware has responsed.
  */
-function makeInjectedResponse(koaCtx, markHandled, whenEnded) {
+function makeInjectedResponse(koaCtx, /*markHandled,*/ whenEnded) {
   let res = koaCtx.res;
 
   res.on('close', whenEnded).on('finish', whenEnded);
@@ -20,7 +19,7 @@ function makeInjectedResponse(koaCtx, markHandled, whenEnded) {
       if (res.statusCode === 404) {
         res.statusCode = 200;
       }
-      markHandled();
+      // markHandled();
     }
   });
   [
@@ -29,7 +28,7 @@ function makeInjectedResponse(koaCtx, markHandled, whenEnded) {
   ].forEach(name => {
     dummyRes.__defineSetter__(name, function (value) {
       res[name] = value;
-      markHandled();
+      // markHandled();
     })
   })
 
@@ -43,15 +42,18 @@ function makeInjectedResponse(koaCtx, markHandled, whenEnded) {
  */
 function handler(ctx, connectMiddleware) {
   return new Promise((resolve, reject) => {
-    let hasHandled = false;
+    // let hasHandled = false;
     // (req, res)
     let args = [
       ctx.req,
-      makeInjectedResponse(ctx, () => {
-        hasHandled = true;
-      }, () => {
-        resolve(false);
-      })
+      makeInjectedResponse(
+        ctx,
+        // () => {
+        //   // hasHandled = true;
+        // },
+        () => {
+          resolve(false);
+        })
     ];
     let assumeSync = true
     // (req, res, next) or (err, req, res, next)
@@ -71,7 +73,7 @@ function handler(ctx, connectMiddleware) {
      * If the middleware function does not declare receiving the `next` callback
      * assume that it's synchronous.
      */
-    if (assumeSync && !hasHandled) {
+    if (assumeSync /*&& !hasHandled*/) {
       resolve(true)
     }
   })
@@ -83,19 +85,19 @@ function handler(ctx, connectMiddleware) {
  * the `next` callback function
  */
 function koaConnect(connectMiddleware) {
-  return function koaConnect(ctx, next) {
+  return async (ctx, next) => {
     ctx.respond = false;
-    return handler(ctx, connectMiddleware).then(goNext => {
-      /** If has responded, assume job is done and skip next. */
-      if(goNext){
+    try {
+      let goNext = await handler(ctx, connectMiddleware)
+      if (goNext) {
         ctx.respond = true;
         return next();
       }
-    }, err => {
+    } catch (err) {
       ctx.respond = true;
       throw err;
-    });
+    };
   }
 }
 
-module.exports = koaConnect
+export = koaConnect

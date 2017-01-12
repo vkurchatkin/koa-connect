@@ -1,9 +1,9 @@
 {
   "name": "koa2-connect",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Use Connect/Express middleware in Koa2",
   "repository": "https://github.com/cyrilluce/koa2-connect",
-  "main": "index.js",
+  "main": "dist/index.js",
   "author": "cyrilluce <cyrilluce@gmail.com>",
   "contributors": [
     "Louis DeScioli <louis.descioli@gmail.com>",
@@ -11,20 +11,23 @@
   ],
   "license": "MIT",
   "scripts": {
-    "test": "mocha tests.js --require mocha-babel",
-    "test:watch": "npm run test -- --watch --reporter nyan"
+    "test": "mocha test/index.js",
+    "test:watch": "npm run test -- --watch --reporter nyan",
+    "build" : "tsc"
   },
   "files": [
-    "index.js",
+    "dist",
+    "ts",
     "README.md"
   ],
+  "engines": {
+    "node": ">=4"
+  },
   "devDependencies": {
-    "babel-plugin-transform-async-to-generator": "^6.16.0",
-    "babel-polyfill": "^6.20.0",
-    "babel-register": "^6.18.0",
     "koa": "^2.0.0",
     "mocha": "^2.3.4",
-    "supertest": "^1.1.0"
+    "supertest": "^1.1.0",
+    "typescript": "^2.1.5"
   },
   "keywords": [
     "koa",

@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es5",
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "experimentalDecorators": true,
+    "noImplicitAny": false,
+    "sourceMap": false,
+    "rootDir": "ts",
+    "outDir": "dist",
+    "watch": true,
+    "lib": [
+      "es5",
+      "es2015.promise"
+    ],
+    "types": [
+    ]
+  },
+  "exclude": [
+    "node_modules",
+    "!node_modules/@types"
+  ],
+  "compileOnSave": false
+}
