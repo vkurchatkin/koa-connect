@@ -7,7 +7,7 @@ app.use(c2k(connect.logger('dev')))
 app.use(c2k(connect.cookieParser()))
 app.use(c2k(connect.cookieSession({ secret: 'keyboard cat'})))
 
-app.use((ctx) {
+app.use((ctx) => {
   const name = ctx.req.session.name = ctx.query.name || ctx.req.session.name
   ctx.body = name || 'Please, enter your name'
 })
