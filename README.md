@@ -1,6 +1,6 @@
-# koa2-connect
-Base on [koa-connect](https://github.com/vkurchatkin/koa-connect), improve to support webpack-dev-middleware and webpack-hot-middleware.
-Use [Express](https://github.com/strongloop/express)/[Connect](https://github.com/senchalabs/connect) middleware with Koa.
+# koa-connect
+
+Use [Express](https://github.com/strongloop/express)/[Connect](https://github.com/senchalabs/connect) middleware with Koa v2.
 
 ## Warning
 It is **highly** recommended to use a Koa-specific middleware instead of trying to convert an Express version when they're available. There is a non-trivial difference in the Koa and Express designs and you will inevitably run into some issues. This module is a workaround for the specific cases where the differences can be ignored. Additionally, it also enables library authors to write 1 version of their HTTP middleware.
@@ -14,7 +14,7 @@ If you're attempting to write a framework-agnostic middleware library, be sure t
 ## Installation
 
 ```sh
-npm install koa2-connect
+npm install koa-connect
 ```
 
 ## Usage
@@ -22,7 +22,7 @@ See `examples/` for more real-world examples.
 
 ```javascript
 const Koa = require('koa')
-const c2k = require('koa2-connect')
+const c2k = require('koa-connect')
 
 // A generic Express-style middleware function
 function connectMiddlware (req, res, next) {
