@@ -10,15 +10,19 @@ function makeInjectedResponse(koaCtx, whenEnded) {
     let dummyRes = res.__dummyRes;
     if (!dummyRes) {
         let statusCodeSetted = false;
+        const default404to200 = function () {
+            if (!statusCodeSetted && res.statusCode === 404) {
+                res.statusCode = 200;
+            }
+        }
         dummyRes = res.__dummyRes = {
             __proto__: res,
             end() {
-                if (!statusCodeSetted && res.statusCode === 404) {
-                    res.statusCode = 200;
-                }
+                default404to200()
                 return res.end.apply(res, arguments);
             },
             write() {
+                default404to200()
                 return res.write.apply(res, arguments);
             },
             set statusCode(v) {
