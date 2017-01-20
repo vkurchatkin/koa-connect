@@ -58,7 +58,8 @@ describe('koa-connect', () => {
     })
 
     app.use(c2k((req, res) => {
-      res.statusCode = 200
+      // koa's default statusCode is 404, connect default statusCode is 200,
+      //res.statusCode = 200
       res.end();
       callOne = true
     }))
@@ -116,6 +117,21 @@ describe('koa-connect', () => {
     supertest(app.callback())
       .get('/')
       .expect(200)
+      .expect(message)
+      .end(done)
+  })
+
+  it('manual response 404 works', (done) => {
+    const message = 'manual 404 content'
+    app.use(c2k((req, res) => {
+      res.statusCode = 404
+      res.setHeader('Content-Length', message.length)
+      res.end(message)
+    }))
+
+    supertest(app.callback())
+      .get('/')
+      .expect(404)
       .expect(message)
       .end(done)
   })

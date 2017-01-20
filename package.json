@@ -1,10 +1,10 @@
 {
-  "name": "koa2-connect",
-  "version": "1.0.2",
-  "description": "Use Connect/Express middleware in Koa2",
+  "name": "koa-connect",
+  "version": "2.0.0",
+  "description": "Use Connect/Express middleware in Koa",
   "repository": "https://github.com/cyrilluce/koa2-connect",
-  "main": "dist/index.js",
-  "author": "cyrilluce <cyrilluce@gmail.com>",
+  "main": "index.js",
+  "author": "Louis DeScioli <louis.descioli@gmail.com>",
   "contributors": [
     "Louis DeScioli <louis.descioli@gmail.com>",
     "cyrilluce <cyrilluce@gmail.com>"
@@ -12,12 +12,10 @@
   "license": "MIT",
   "scripts": {
     "test": "mocha test/index.js",
-    "test:watch": "npm run test -- --watch --reporter nyan",
-    "build" : "tsc"
+    "test:watch": "npm run test -- --watch --reporter nyan"
   },
   "files": [
-    "dist",
-    "ts",
+    "index.js",
     "README.md"
   ],
   "engines": {
@@ -26,8 +24,7 @@
   "devDependencies": {
     "koa": "^2.0.0",
     "mocha": "^2.3.4",
-    "supertest": "^1.1.0",
-    "typescript": "^2.1.5"
+    "supertest": "^1.1.0"
   },
   "keywords": [
     "koa",
