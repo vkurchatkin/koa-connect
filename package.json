@@ -1,11 +1,13 @@
 {
   "name": "koa-connect",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Use Connect/Express middleware in Koa",
   "repository": "vkurchatkin/koa-connect",
   "main": "index.js",
   "author": "Vladimir Kurchatkin <vladimir.kurchatkin@gmail.com>",
-  "contributors": ["Louis DeScioli (https://descioli.design)"],
+  "contributors": [
+    "Louis DeScioli (https://descioli.design)"
+  ],
   "license": "MIT",
   "scripts": {
     "test": "mocha tests.js",
@@ -16,5 +18,10 @@
     "mocha": "^2.3.4",
     "supertest": "^1.1.0"
   },
-  "keywords": ["koa", "connect", "express", "middleware"]
+  "keywords": [
+    "koa",
+    "connect",
+    "express",
+    "middleware"
+  ]
 }
