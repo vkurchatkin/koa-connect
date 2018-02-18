@@ -1,8 +1,16 @@
 /**
+ * Add alias for adapting the difference between express and koa
+ */
+function adaptResponseProperties(req, res) {
+  Object.defineProperty(res, 'statusCode', { get: function() { return this.status; } });
+  Object.defineProperty(res, 'statusCode', { set: function(code) { this.status = code; } });
+}
+
+/**
  * If the middleware function does declare receiving the `next` callback
  * assume that it's synchronous and invoke `next` ourselves
  */
-function noCallbackHandler(ctx, connectMiddleware, next) {
+function noCallbackHandler(ctx, connectMiddleware, next) {  
   connectMiddleware(ctx.req, ctx.res)
   return next()
 }
@@ -31,6 +39,7 @@ function koaConnect(connectMiddleware) {
     ? noCallbackHandler
     : withCallbackHandler
   return function koaConnect(ctx, next) {
+    adaptResponseProperties(ctx.req, ctx.res);
     return handler(ctx, connectMiddleware, next)
   }
 }
