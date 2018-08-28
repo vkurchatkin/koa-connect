@@ -5,6 +5,8 @@
 
 Use [Express](https://github.com/strongloop/express)/[Connect](https://github.com/senchalabs/connect) middleware with [Koa](https://github.com/koajs/koa).
 
+<a href="https://communityinviter.com/apps/koa-js/koajs" rel="KoaJs Slack Community">![KoaJs Slack](https://img.shields.io/badge/Koa.Js-Slack%20Channel-Slack.svg?longCache=true&style=for-the-badge)</a>
+
 ## Warning
 
 It is **highly** recommended to use a Koa-specific middleware instead of trying to convert an Express version when they're available. There is a non-trivial difference in the Koa and Express designs and you will inevitably run into some issues. This module is a workaround for the specific cases where the differences can be ignored. Additionally, it also enables library authors to write 1 version of their HTTP middleware.
