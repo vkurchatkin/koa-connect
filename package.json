@@ -4,19 +4,25 @@
   "description": "Use Connect/Express middleware in Koa",
   "repository": "vkurchatkin/koa-connect",
   "main": "index.js",
+  "types": "index.d.ts",
   "author": "Vladimir Kurchatkin <vladimir.kurchatkin@gmail.com>",
   "contributors": [
     "Louis DeScioli (https://descioli.design)"
   ],
   "license": "MIT",
   "scripts": {
+    "start": "tsc --watch",
+    "build": "tsc",
     "test": "mocha tests.js",
     "test:watch": "npm run test -- --watch --reporter nyan"
   },
   "devDependencies": {
+    "@types/koa": "^2.0.46",
+    "@types/node": "^10.9.2",
     "koa": "^2.0.0",
     "mocha": "^2.3.4",
-    "supertest": "^1.1.0"
+    "supertest": "^1.1.0",
+    "typescript": "^3.0.1"
   },
   "keywords": [
     "koa",
