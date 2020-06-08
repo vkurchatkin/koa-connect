@@ -1,12 +1,11 @@
-'use strict'
-
-const Koa = require('koa')
-const supertest = require('supertest')
-const c2k = require('./index')
-const assert = require('assert')
+import Koa, { Context } from 'koa';
+import supertest from 'supertest'
+import c2k from './index';
+import assert from 'assert';
+import { IncomingMessage, ServerResponse } from 'http';
 
 describe('koa-connect', () => {
-  let app
+  let app: Koa;
 
   beforeEach(() => {
     app = new Koa()
@@ -18,7 +17,7 @@ describe('koa-connect', () => {
   })
 
   it('works with a single noop Connect middleware', (done) => {
-    function noop(req, res, next) { next() }
+    function noop(req: IncomingMessage, res: ServerResponse, next: () => void) { next() }
     app.use(c2k(noop))
     supertest(app.callback())
       .get('/')
@@ -27,7 +26,7 @@ describe('koa-connect', () => {
   })
 
   it('works with two noop Connect middleware', (done) => {
-    function noop(req, res, next) { next() }
+    function noop(req: IncomingMessage, res: ServerResponse, next: () => void) { next() }
     app.use(c2k(noop))
     app.use(c2k(noop))
     supertest(app.callback())
@@ -37,8 +36,8 @@ describe('koa-connect', () => {
   })
 
   it('passes correctly to downstream Koa middlewares', (done) => {
-    function noop(req, res, next) { next() }
-    function goodStatusSetter(ctx) { ctx.status = 200 }
+    function noop(req: IncomingMessage, res: ServerResponse, next: () => void) { next() }
+    function goodStatusSetter(ctx: Context) { ctx.status = 200 }
     app.use(c2k(noop))
     app.use(goodStatusSetter)
     supertest(app.callback())
@@ -57,7 +56,7 @@ describe('koa-connect', () => {
         })
     })
 
-    app.use(c2k((req, res) => {
+    app.use(c2k((req: IncomingMessage, res: ServerResponse) => {
       res.statusCode = 200
       callOne = true
     }))
@@ -106,7 +105,7 @@ describe('koa-connect', () => {
         })
     })
 
-    app.use(c2k((req, res) => {
+    app.use(c2k((req: IncomingMessage, res: ServerResponse) => {
       res.statusCode = 200
       res.setHeader('Content-Length', message.length)
       res.end(message)

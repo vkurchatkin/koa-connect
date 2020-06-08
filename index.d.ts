@@ -2,7 +2,7 @@
 import { Middleware } from 'koa';
 import { IncomingMessage, ServerResponse } from 'http';
 declare type ConnectMiddlewareNoCallback = (req: IncomingMessage, res: ServerResponse) => void;
-declare type ConnectMiddlewareWithCallback = (req: IncomingMessage, res: ServerResponse, callback: (...args: any[]) => void) => void;
+declare type ConnectMiddlewareWithCallback = (req: IncomingMessage, res: ServerResponse, callback: (...args: unknown[]) => void) => void;
 declare type ConnectMiddleware = ConnectMiddlewareNoCallback | ConnectMiddlewareWithCallback;
 /**
  * Returns a Koa middleware function that varies its async logic based on if the

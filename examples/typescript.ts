@@ -2,7 +2,7 @@ import { IncomingMessage, ServerResponse } from "http";
 import Koa = require('koa')
 import c2k = require('../index')
 
-function middleware (req: {}, res: {}, next: (err?: any) => void) {
+function middleware (req: IncomingMessage, res: ServerResponse, next: (err?: unknown) => void) {
   console.log('connect')
   next()
 }
