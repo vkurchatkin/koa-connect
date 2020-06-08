@@ -1,17 +1,30 @@
 import { Context, Middleware } from 'koa';
 import { IncomingMessage, ServerResponse } from 'http';
 
-type ConnectMiddlewareNoCallback = (req: IncomingMessage, res: ServerResponse) => void;
-type ConnectMiddlewareWithCallback = (req: IncomingMessage, res: ServerResponse, callback: (...args: unknown[]) => void) => void;
-type ConnectMiddleware = ConnectMiddlewareNoCallback | ConnectMiddlewareWithCallback
+type ConnectMiddlewareNoCallback = (
+  req: IncomingMessage,
+  res: ServerResponse
+) => void;
+type ConnectMiddlewareWithCallback = (
+  req: IncomingMessage,
+  res: ServerResponse,
+  callback: (...args: unknown[]) => void
+) => void;
+type ConnectMiddleware =
+  | ConnectMiddlewareNoCallback
+  | ConnectMiddlewareWithCallback;
 
 /**
  * If the middleware function does not declare receiving the `next` callback
  * assume that it's synchronous and invoke `next` ourselves.
  */
-function noCallbackHandler(ctx: Context, connectMiddleware: ConnectMiddlewareNoCallback, next: (err?: unknown) => Promise<void>): Promise<void> {
-  connectMiddleware(ctx.req, ctx.res)
-  return next()
+function noCallbackHandler(
+  ctx: Context,
+  connectMiddleware: ConnectMiddlewareNoCallback,
+  next: (err?: unknown) => Promise<void>
+): Promise<void> {
+  connectMiddleware(ctx.req, ctx.res);
+  return next();
 }
 
 /**
@@ -19,16 +32,22 @@ function noCallbackHandler(ctx: Context, connectMiddleware: ConnectMiddlewareNoC
  * the Promise when it's called. If it's never called, the middleware stack
  * completion will stall.
  */
-function withCallbackHandler(ctx: Context, connectMiddleware: ConnectMiddlewareWithCallback, next: (err?: unknown) => Promise<void>): Promise<void> {
+function withCallbackHandler(
+  ctx: Context,
+  connectMiddleware: ConnectMiddlewareWithCallback,
+  next: (err?: unknown) => Promise<void>
+): Promise<void> {
   return new Promise<void>((resolve, reject) => {
     connectMiddleware(ctx.req, ctx.res, (err?: unknown) => {
-      if (err) reject(err)
-      else resolve(next())
-    })
-  })
+      if (err) reject(err);
+      else resolve(next());
+    });
+  });
 }
 
-function hasNoCallback(middleware: ConnectMiddleware): middleware is ConnectMiddlewareNoCallback {
+function hasNoCallback(
+  middleware: ConnectMiddleware
+): middleware is ConnectMiddlewareNoCallback {
   return middleware.length < 3;
 }
 
@@ -42,7 +61,7 @@ function koaConnect(connectMiddleware: ConnectMiddleware): Middleware {
     return hasNoCallback(connectMiddleware)
       ? noCallbackHandler(ctx, connectMiddleware, next)
       : withCallbackHandler(ctx, connectMiddleware, next);
-  }
+  };
 }
 
 export = koaConnect;

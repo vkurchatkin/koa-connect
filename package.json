@@ -21,8 +21,11 @@
     "@types/mocha": "^7.0.2",
     "@types/node": "^10.9.2",
     "@types/supertest": "^2.0.9",
+    "husky": "^4.2.5",
     "koa": "^2.0.0",
+    "lint-staged": "^10.2.9",
     "mocha": "^2.3.4",
+    "prettier": "^2.0.5",
     "supertest": "^1.1.0",
     "ts-node": "^8.10.2",
     "typescript": "^3.0.1"
@@ -32,5 +35,13 @@
     "connect",
     "express",
     "middleware"
-  ]
+  ],
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{ts,md},!(*d).ts": "prettier --single-quote --write"
+  }
 }
