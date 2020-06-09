@@ -12,7 +12,7 @@
   "license": "MIT",
   "scripts": {
     "start": "tsc --watch",
-    "build": "tsc",
+    "build": "tsc -p tsconfig-build.json",
     "test": "mocha -r ts-node/register tests.ts",
     "test:watch": "npm run test -- --watch --watch-extensions ts --reporter nyan"
   },
@@ -42,6 +42,7 @@
     }
   },
   "lint-staged": {
-    "*.{ts,md},!(*d).ts": "prettier --single-quote --write"
+    "!(*.d).ts": "prettier --single-quote --write",
+    "*.md": "prettier --write"
   }
 }

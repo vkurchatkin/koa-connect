@@ -1,18 +1,13 @@
 import { Context, Middleware } from 'koa';
 import { IncomingMessage, ServerResponse } from 'http';
 
-type ConnectMiddlewareNoCallback = (
-  req: IncomingMessage,
-  res: ServerResponse
-) => void;
-type ConnectMiddlewareWithCallback = (
+type ConnectMiddleware = (
   req: IncomingMessage,
   res: ServerResponse,
   callback: (...args: unknown[]) => void
 ) => void;
-type ConnectMiddleware =
-  | ConnectMiddlewareNoCallback
-  | ConnectMiddlewareWithCallback;
+
+const noop = () => {};
 
 /**
  * If the middleware function does not declare receiving the `next` callback
@@ -20,10 +15,10 @@ type ConnectMiddleware =
  */
 function noCallbackHandler(
   ctx: Context,
-  connectMiddleware: ConnectMiddlewareNoCallback,
+  connectMiddleware: ConnectMiddleware,
   next: (err?: unknown) => Promise<void>
 ): Promise<void> {
-  connectMiddleware(ctx.req, ctx.res);
+  connectMiddleware(ctx.req, ctx.res, noop);
   return next();
 }
 
@@ -34,7 +29,7 @@ function noCallbackHandler(
  */
 function withCallbackHandler(
   ctx: Context,
-  connectMiddleware: ConnectMiddlewareWithCallback,
+  connectMiddleware: ConnectMiddleware,
   next: (err?: unknown) => Promise<void>
 ): Promise<void> {
   return new Promise<void>((resolve, reject) => {
@@ -45,22 +40,16 @@ function withCallbackHandler(
   });
 }
 
-function hasNoCallback(
-  middleware: ConnectMiddleware
-): middleware is ConnectMiddlewareNoCallback {
-  return middleware.length < 3;
-}
-
 /**
  * Returns a Koa middleware function that varies its async logic based on if the
  * given middleware function declares at least 3 parameters, i.e. includes
  * the `next` callback function.
  */
 function koaConnect(connectMiddleware: ConnectMiddleware): Middleware {
+  const handler =
+    connectMiddleware.length < 3 ? noCallbackHandler : withCallbackHandler;
   return function koaConnect(ctx: Context, next: () => Promise<void>) {
-    return hasNoCallback(connectMiddleware)
-      ? noCallbackHandler(ctx, connectMiddleware, next)
-      : withCallbackHandler(ctx, connectMiddleware, next);
+    return handler(ctx, connectMiddleware, next);
   };
 }
 
