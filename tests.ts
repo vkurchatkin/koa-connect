@@ -3,8 +3,9 @@ import supertest from 'supertest';
 import c2k from './index';
 import assert from 'assert';
 import { IncomingMessage, ServerResponse } from 'http';
+import * as bodyParser from 'body-parser';
 
-describe('koa-connect', () => {
+describe.skip('koa-connect', () => {
   let app: Koa;
 
   beforeEach(() => {
@@ -112,5 +113,26 @@ describe('koa-connect', () => {
     );
 
     supertest(app.callback()).get('/').expect(200).expect(message).end(done);
+  });
+});
+
+describe('integration tests', () => {
+  let app: Koa;
+
+  beforeEach(() => {
+    app = new Koa();
+  });
+
+  it('works with body-parser', (done) => {
+    const obj = { foo: '🦞' };
+    app.use(c2k(bodyParser.json()));
+    app.use((ctx, next) => {
+      // TODO fix types, remove need for any
+      const req = ctx.req as any;
+      assert(req.body.foo === obj.foo);
+      ctx.response.status = 200;
+      next();
+    });
+    supertest(app.callback()).post('/').send(obj).expect(200).end(done);
   });
 });

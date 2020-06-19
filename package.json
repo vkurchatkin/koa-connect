@@ -17,10 +17,12 @@
     "test:watch": "npm run test -- --watch --watch-extensions ts --reporter nyan"
   },
   "devDependencies": {
+    "@types/body-parser": "^1.19.0",
     "@types/koa": "^2.0.46",
     "@types/mocha": "^7.0.2",
     "@types/node": "^10.9.2",
     "@types/supertest": "^2.0.9",
+    "body-parser": "^1.19.0",
     "husky": "^4.2.5",
     "koa": "^2.0.0",
     "lint-staged": "^10.2.9",
