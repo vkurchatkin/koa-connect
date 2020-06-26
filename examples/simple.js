@@ -9,7 +9,7 @@ function middleware (req, res, next) {
 const app = new Koa()
 app.use(c2k(middleware))
 
-app.use((ctx) {
+app.use((ctx) => {
   ctx.body = 'koa'
 })
 
